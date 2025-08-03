@@ -1,16 +1,15 @@
-"""Alembic migration environment for fitness-tracker."""
-
-from logging.config import fileConfig
 import os
 import sys
-from sqlalchemy import engine_from_config, pool
+from logging.config import fileConfig
+
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(PROJECT_DIR)
 
-from backend.extensions import db           # noqa: E402
-from backend import models                  # noqa: F401, E402  (side-effect: rejestruje tabele)
+from backend import models  # noqa: F401, E402
+from backend.extensions import db  # noqa: E402
 
 config = context.config
 if config.config_file_name is not None:

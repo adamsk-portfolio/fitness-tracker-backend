@@ -1,16 +1,15 @@
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
+import tempfile
+
+import pytest
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
-
-import os
-import tempfile
-
-import pytest
 
 from backend.app import create_app
 from backend.extensions import db as _db
@@ -31,12 +30,14 @@ def app():
         _db.create_all()
 
     yield app
+
     with app.app_context():
         _db.session.remove()
         _db.drop_all()
 
     os.close(db_fd)
     os.unlink(db_path)
+
 
 @pytest.fixture(scope="function")
 def client(app):

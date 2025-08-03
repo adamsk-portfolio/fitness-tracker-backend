@@ -1,6 +1,11 @@
-import os
+from __future__ import annotations
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'fitness.db')
-SQLALCHEMY_TRACK_MODIFICATIONS = False
-JWT_SECRET_KEY = 'zmienToNaBezpiecznyKlucz'   # później przenieś do .env
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+SQLALCHEMY_DATABASE_URI: str = os.getenv(
+    "DATABASE_URL", f"sqlite:///{BASE_DIR / 'fitness.db'}"
+)
+SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "dev-secret")
