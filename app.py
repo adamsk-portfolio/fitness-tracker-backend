@@ -1,8 +1,9 @@
-from . import config
 from flask import Flask
-from flask_restful import Api
 from flask_cors import CORS
-from .extensions import db, migrate, jwt
+from flask_restful import Api
+
+from . import config
+from .extensions import db, jwt, migrate
 
 
 def create_app():
@@ -17,15 +18,13 @@ def create_app():
     CORS(app)                          # <- pozwoli łączyć się z front‑endu React
 
     # -------- modele (dla migracji) --------
-    from .models import (              # noqa: F401
-        User, ExerciseType, WorkoutSession, Goal
-    )
+    from .models import ExerciseType, Goal, User, WorkoutSession  # noqa: F401
 
     # -------- zasoby --------
-    from .resources.auth import Register, Login
-    from .resources.exercise import ExerciseTypeList, ExerciseTypeDetail
-    from .resources.session import SessionList, SessionDetail
-    from .resources.goal import GoalList, GoalDetail
+    from .resources.auth import Login, Register
+    from .resources.exercise import ExerciseTypeDetail, ExerciseTypeList
+    from .resources.goal import GoalDetail, GoalList
+    from .resources.session import SessionDetail, SessionList
 
     api.add_resource(GoalList, '/goals')
     api.add_resource(GoalDetail, '/goals/<int:goal_id>')

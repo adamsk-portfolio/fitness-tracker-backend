@@ -1,5 +1,6 @@
 from flask import request
 from flask_restful import Resource
+
 from ..extensions import db
 from ..models import User
 
