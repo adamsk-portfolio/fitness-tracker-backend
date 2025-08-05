@@ -14,7 +14,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    api = Api(app)
+    api = Api(app, prefix='/api')
     CORS(app)                          # <- pozwoli łączyć się z front‑endu React
 
     # -------- modele (dla migracji) --------
