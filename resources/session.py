@@ -4,7 +4,6 @@ from flask_restful import Resource, reqparse
 from ..extensions import db
 from ..models import ExerciseType, WorkoutSession
 
-# --- parsery ---
 create_parser = reqparse.RequestParser()
 create_parser.add_argument('exercise_type_id', type=int, required=True)
 create_parser.add_argument('duration',         type=int, required=True)
@@ -14,7 +13,6 @@ update_parser = reqparse.RequestParser()
 update_parser.add_argument('duration', type=int)
 update_parser.add_argument('calories', type=int)
 
-# --- zasoby ---
 class SessionList(Resource):
     @jwt_required()
     def get(self):
