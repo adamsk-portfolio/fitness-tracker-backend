@@ -1,16 +1,29 @@
 """init
 
+<<<<<<<< HEAD:backend/migrations/versions/5e02d5bce64c_init.py
 Revision ID: 5e02d5bce64c
 Revises: 
 Create Date: 2025-08-06 00:22:54.542182
 
 """
+========
+Revision ID: 94654c06787d
+Revises: 
+Create Date: 2025-08-05 21:27:54.224395
+
+"""
+import sqlalchemy as sa
+>>>>>>>> e659b97b42d18aeed6ef6bc01bb7f7cf733fc71a:backend/migrations/versions/94654c06787d_init.py
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+<<<<<<<< HEAD:backend/migrations/versions/5e02d5bce64c_init.py
 revision = '5e02d5bce64c'
+========
+revision = '94654c06787d'
+>>>>>>>> e659b97b42d18aeed6ef6bc01bb7f7cf733fc71a:backend/migrations/versions/94654c06787d_init.py
 down_revision = None
 branch_labels = None
 depends_on = None
