@@ -1,17 +1,14 @@
+from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 
 from . import config
 from .extensions import db, jwt, migrate
-
 from .models import ExerciseType, Goal, User, WorkoutSession  # noqa: F401
-
 from .resources.auth import Login, Register
 from .resources.exercise import ExerciseTypeDetail, ExerciseTypeList
 from .resources.goal import GoalDetail, GoalList
 from .resources.session import SessionDetail, SessionList
-
-from flask import Flask
 
 
 def create_app():
