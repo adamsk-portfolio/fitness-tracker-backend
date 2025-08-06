@@ -10,17 +10,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
 
-    # -------- rozszerzenia --------
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    api = Api(app)
-    CORS(app)                          # <- pozwoli łączyć się z front‑endu React
+    api = Api(app, prefix='/api')
+    CORS(app)
 
-    # -------- modele (dla migracji) --------
     from .models import ExerciseType, Goal, User, WorkoutSession  # noqa: F401
-
-    # -------- zasoby --------
     from .resources.auth import Login, Register
     from .resources.exercise import ExerciseTypeDetail, ExerciseTypeList
     from .resources.goal import GoalDetail, GoalList
@@ -35,12 +31,10 @@ def create_app():
     api.add_resource(ExerciseTypeList,   '/exercise-types')
     api.add_resource(ExerciseTypeDetail, '/exercise-types/<int:type_id>')
 
-    # -------- prosty GET --------
     @app.route('/', methods=['GET'])
     def hello():
         return {'message': 'Fitness Tracker API działa!'}
 
-    # -------- mapa tras (debug) --------
     print('\n=== URL MAP ===')
     for rule in app.url_map.iter_rules():
         methods = ','.join(sorted(rule.methods))
