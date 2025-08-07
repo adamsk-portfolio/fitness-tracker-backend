@@ -4,7 +4,6 @@ from flask_restful import Resource, reqparse
 from ..extensions import db
 from ..models import Goal
 
-# --- parsery ---
 create_parser = reqparse.RequestParser()
 create_parser.add_argument('description',  required=True, help='description required')
 create_parser.add_argument('target_value', type=int,   required=True)
@@ -15,7 +14,6 @@ update_parser.add_argument('description')
 update_parser.add_argument('target_value', type=int)
 update_parser.add_argument('period',       choices=('daily', 'weekly'))
 
-# --- zasoby ---
 class GoalList(Resource):
     @jwt_required()
     def get(self):
