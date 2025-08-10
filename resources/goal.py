@@ -1,5 +1,5 @@
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_restful import Resource, reqparse, abort
+from flask_restful import Resource, abort, reqparse
 
 from ..extensions import db
 from ..models import Goal
