@@ -13,25 +13,42 @@ update_parser = reqparse.RequestParser()
 update_parser.add_argument('duration', type=int)
 update_parser.add_argument('calories', type=int)
 
+def _get_or_404_owned(session_id: int, owner_id: int) -> WorkoutSession:
+    session = WorkoutSession.query.filter_by(id=session_id, user_id=owner_id).first()
+    if session is None:
+        from flask_restful import abort
+        abort(404, message="Session not found")
+    return session
+
 class SessionList(Resource):
     @jwt_required()
     def get(self):
         user_id = int(get_jwt_identity())
-        sessions = WorkoutSession.query.filter_by(user_id=user_id).all()
+
+        sessions = (
+            WorkoutSession.query
+            .filter_by(user_id=user_id)
+            .join(ExerciseType, WorkoutSession.exercise_type_id == ExerciseType.id)
+            .add_columns(ExerciseType.name.label("etype_name"))
+            .order_by(WorkoutSession.date.desc())
+            .all()
+        )
+
         return [
             {
-                'id': s.id,
-                'exercise_type': ExerciseType.query.get(s.exercise_type_id).name,
-                'duration': s.duration,
-                'calories': s.calories,
-                'date': s.date.isoformat()
-            } for s in sessions
+                'id': s.WorkoutSession.id,
+                'exercise_type': s.etype_name,
+                'duration': s.WorkoutSession.duration,
+                'calories': s.WorkoutSession.calories,
+                'date': s.WorkoutSession.date.isoformat(),
+            }
+            for s in sessions
         ], 200
 
     @jwt_required()
     def post(self):
-        args = create_parser.parse_args()
         user_id = int(get_jwt_identity())
+        args = create_parser.parse_args()
 
         session = WorkoutSession(
             user_id=user_id,
@@ -41,14 +58,17 @@ class SessionList(Resource):
         )
         db.session.add(session)
         db.session.commit()
+
         return {'id': session.id}, 201
 
 
 class SessionDetail(Resource):
     @jwt_required()
     def put(self, session_id):
+        user_id = int(get_jwt_identity())
         args = update_parser.parse_args()
-        session = WorkoutSession.query.get_or_404(session_id)
+
+        session = _get_or_404_owned(session_id, user_id)
 
         if args['duration'] is not None:
             session.duration = args['duration']
@@ -60,7 +80,9 @@ class SessionDetail(Resource):
 
     @jwt_required()
     def delete(self, session_id):
-        session = WorkoutSession.query.get_or_404(session_id)
+        user_id = int(get_jwt_identity())
+        session = _get_or_404_owned(session_id, user_id)
+
         db.session.delete(session)
         db.session.commit()
         return {'message': 'deleted'}, 204
