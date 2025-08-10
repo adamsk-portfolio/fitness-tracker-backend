@@ -7,6 +7,7 @@ RUN pip install --upgrade pip \
  && pip install gunicorn
 
 COPY backend/ /app/backend
+COPY migrations/ /app/migrations/
 
 EXPOSE 5000
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "backend.app:create_app()"]

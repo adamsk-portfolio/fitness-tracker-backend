@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from flask_jwt_extended import create_access_token
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -13,6 +12,7 @@ class User(db.Model):
 
     sessions = db.relationship('WorkoutSession', backref='user', lazy=True)
     goals = db.relationship('Goal', backref='user', lazy=True)
+    types = db.relationship('ExerciseType', backref='user', lazy=True)
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -25,8 +25,9 @@ class User(db.Model):
 
 
 class ExerciseType(db.Model):
-    id   = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
 
     sessions = db.relationship('WorkoutSession', backref='type', lazy=True)
 
