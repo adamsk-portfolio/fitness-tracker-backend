@@ -7,13 +7,15 @@ from .extensions import db
 
 
 class User(db.Model):
+    __tablename__ = "user"
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    sessions = db.relationship('WorkoutSession', backref='user', lazy=True)
-    goals = db.relationship('Goal', backref='user', lazy=True)
-    types = db.relationship('ExerciseType', backref='user', lazy=True)
+    sessions = db.relationship("WorkoutSession", backref="user", lazy=True)
+    goals = db.relationship("Goal", backref="user", lazy=True)
+    types = db.relationship("ExerciseType", backref="user", lazy=True)
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -26,25 +28,36 @@ class User(db.Model):
 
 
 class ExerciseType(db.Model):
+    __tablename__ = "exercise_type"
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     name = db.Column(db.String(50), nullable=False)
 
-    sessions = db.relationship('WorkoutSession', backref='type', lazy=True)
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "name", name="uq_exercise_type_user_name"),
+        db.Index("ix_exercise_type_user_id", "user_id"),
+    )
+
+    sessions = db.relationship("WorkoutSession", backref="type", lazy=True)
 
 
 class WorkoutSession(db.Model):
+    __tablename__ = "workout_session"
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    exercise_type_id = db.Column(db.Integer, db.ForeignKey('exercise_type.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    exercise_type_id = db.Column(db.Integer, db.ForeignKey("exercise_type.id"), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     calories = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.DateTime, default=datetime.utcnow)  # callable, bez nawiasów
 
 
 class Goal(db.Model):
+    __tablename__ = "goal"
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     description = db.Column(db.String(140), nullable=False)
     target_value = db.Column(db.Integer, nullable=False)
     period = db.Column(db.String(20), nullable=False)
