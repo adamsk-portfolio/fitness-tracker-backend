@@ -17,7 +17,6 @@ def create_app():
     CORS(app)
 
     from .models import ExerciseType, Goal, User, WorkoutSession  # noqa: F401
-
     from .resources.auth import Login, Register
     from .resources.exercise import ExerciseTypeDetail, ExerciseTypeList
     from .resources.goal import GoalDetail, GoalList

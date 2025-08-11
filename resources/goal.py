@@ -1,10 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import Resource, abort, reqparse
 
 from ..extensions import db
-from ..models import Goal, ExerciseType
+from ..models import ExerciseType, Goal
 
 
 def _positive_int(v):
@@ -29,13 +29,48 @@ def _parse_iso(d: str):
 
 
 create_parser = reqparse.RequestParser()
-create_parser.add_argument("description", type=str, required=True, location=("json", "form"))
-create_parser.add_argument("target_value", type=_positive_int, required=True, location=("json", "form"))
-create_parser.add_argument("period", type=str, required=True, location=("json", "form"))
-create_parser.add_argument("metric", type=str, required=True, location=("json", "form"))
-create_parser.add_argument("exercise_type_id", type=int, required=False, location=("json", "form"))
-create_parser.add_argument("start_date", type=str, required=False, location=("json", "form"))
-create_parser.add_argument("end_date", type=str, required=False, location=("json", "form"))
+create_parser.add_argument(
+    "description",
+    type=str,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "target_value",
+    type=_positive_int,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "period",
+    type=str,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "metric",
+    type=str,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "exercise_type_id",
+    type=int,
+    required=False,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "start_date",
+    type=str,
+    required=False,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "end_date",
+    type=str,
+    required=False,
+    location=("json", "form"),
+)
 
 list_parser = reqparse.RequestParser()
 list_parser.add_argument("page", type=int, default=1, location="args")
