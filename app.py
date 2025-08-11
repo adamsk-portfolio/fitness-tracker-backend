@@ -13,7 +13,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    api = Api(app, prefix='/api')
+    api = Api(app, prefix="/api")
     CORS(app)
 
     from .models import ExerciseType, Goal, User, WorkoutSession  # noqa: F401
@@ -22,29 +22,32 @@ def create_app():
     from .resources.goal import GoalDetail, GoalList
     from .resources.session import SessionDetail, SessionList
 
-    api.add_resource(GoalList, '/goals')
-    api.add_resource(GoalDetail, '/goals/<int:goal_id>')
-    api.add_resource(SessionList, '/sessions')
-    api.add_resource(SessionDetail, '/sessions/<int:session_id>')
-    api.add_resource(Register,           '/auth/register')
-    api.add_resource(Login,              '/auth/login')
-    api.add_resource(ExerciseTypeList,   '/exercise-types')
-    api.add_resource(ExerciseTypeDetail, '/exercise-types/<int:type_id>')
+    api.add_resource(GoalList, "/goals")
+    api.add_resource(GoalDetail, "/goals/<int:goal_id>")
 
-    @app.route('/', methods=['GET'])
+    api.add_resource(SessionList, "/sessions")
+    api.add_resource(SessionDetail, "/sessions/<int:session_id>")
+
+    api.add_resource(Register, "/auth/register")
+    api.add_resource(Login, "/auth/login")
+
+    api.add_resource(ExerciseTypeList, "/exercise-types")
+    api.add_resource(ExerciseTypeDetail, "/exercise-types/<int:type_id>")
+
+    @app.route("/", methods=["GET"])
     def hello():
-        return {'message': 'Fitness Tracker API działa!'}
+        return {"message": "Fitness Tracker API działa!"}
 
-    print('\n=== URL MAP ===')
+    print("\n=== URL MAP ===")
     for rule in app.url_map.iter_rules():
-        methods = ','.join(sorted(rule.methods))
-        print(f'{rule.rule:35} -> {methods}')
-    print('==============\n')
+        methods = ",".join(sorted(rule.methods))
+        print(f"{rule.rule:35} -> {methods}")
+    print("==============\n")
 
     return app
 
 
 app = create_app()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
