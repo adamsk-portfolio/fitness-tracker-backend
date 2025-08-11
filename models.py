@@ -40,6 +40,7 @@ class ExerciseType(db.Model):
     )
 
     sessions = db.relationship("WorkoutSession", backref="type", lazy=True)
+    goals = db.relationship("Goal", backref="exercise_type", lazy=True)
 
 
 class WorkoutSession(db.Model):
@@ -50,7 +51,7 @@ class WorkoutSession(db.Model):
     exercise_type_id = db.Column(db.Integer, db.ForeignKey("exercise_type.id"), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     calories = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)  # callable, bez nawiasów
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class Goal(db.Model):
@@ -58,6 +59,12 @@ class Goal(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
     description = db.Column(db.String(140), nullable=False)
     target_value = db.Column(db.Integer, nullable=False)
     period = db.Column(db.String(20), nullable=False)
+
+    metric = db.Column(db.String(20), nullable=False, default="duration")
+    start_date = db.Column(db.DateTime, nullable=True)
+    end_date = db.Column(db.DateTime, nullable=True)
+    exercise_type_id = db.Column(db.Integer, db.ForeignKey("exercise_type.id"), nullable=True)
