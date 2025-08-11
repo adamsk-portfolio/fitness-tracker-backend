@@ -20,21 +20,50 @@ def _positive_int(v):
 
 
 create_parser = reqparse.RequestParser()
-create_parser.add_argument("exercise_type_id", type=int,           required=True,  location=("json", "form"))
-create_parser.add_argument("duration",         type=_positive_int, required=True,  location=("json", "form"))
-create_parser.add_argument("calories",         type=_positive_int, required=True,  location=("json", "form"))
-create_parser.add_argument("date",             type=str,           required=False, location=("json", "form"))
+create_parser.add_argument(
+    "exercise_type_id",
+    type=int,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "duration",
+    type=_positive_int,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "calories",
+    type=_positive_int,
+    required=True,
+    location=("json", "form"),
+)
+create_parser.add_argument(
+    "date",
+    type=str,
+    required=False,
+    location=("json", "form"),
+)
 
 update_parser = reqparse.RequestParser()
-update_parser.add_argument("duration", type=_positive_int, location=("json", "form"))
-update_parser.add_argument("calories", type=_positive_int, location=("json", "form"))
+update_parser.add_argument(
+    "duration",
+    type=_positive_int,
+    location=("json", "form"),
+)
+update_parser.add_argument(
+    "calories",
+    type=_positive_int,
+    location=("json", "form"),
+)
 
 list_parser = reqparse.RequestParser()
 list_parser.add_argument("page",      type=int, default=1,  location="args")
 list_parser.add_argument("page_size", type=int, default=10, location="args")
-list_parser.add_argument("type_id",   type=int,              location="args")
-list_parser.add_argument("date_from", type=str,              location="args")
-list_parser.add_argument("date_to",   type=str,              location="args")
+list_parser.add_argument("type_id",   type=int, location="args")
+list_parser.add_argument("date_from", type=str, location="args")
+list_parser.add_argument("date_to",   type=str, location="args")
+
 
 
 def _get_or_404_owned(session_id: int, owner_id: int) -> WorkoutSession:
