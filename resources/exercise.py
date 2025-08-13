@@ -10,11 +10,13 @@ from ..models import ExerciseType
 _parser = reqparse.RequestParser()
 _parser.add_argument("name", required=True, help="name is required")
 
+
 def _get_owned_or_404(type_id: int, owner_id: int) -> ExerciseType:
     typ = ExerciseType.query.filter_by(id=type_id, user_id=owner_id).first()
     if typ is None:
         abort(404, description="Exercise type not found")
     return typ
+
 
 class ExerciseTypeList(Resource):
     @jwt_required()
@@ -28,9 +30,7 @@ class ExerciseTypeList(Resource):
         uid = int(get_jwt_identity())
         args = _parser.parse_args()
 
-        exists = ExerciseType.query.filter_by(
-            user_id=uid, name=args["name"]
-        ).first()
+        exists = ExerciseType.query.filter_by(user_id=uid, name=args["name"]).first()
         if exists:
             return {"message": "Exercise type already exists"}, 400
 
@@ -38,6 +38,7 @@ class ExerciseTypeList(Resource):
         db.session.add(typ)
         db.session.commit()
         return {"id": typ.id, "name": typ.name}, 201
+
 
 class ExerciseTypeDetail(Resource):
     @jwt_required()

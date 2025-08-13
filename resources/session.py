@@ -58,12 +58,11 @@ update_parser.add_argument(
 )
 
 list_parser = reqparse.RequestParser()
-list_parser.add_argument("page",      type=int, default=1,  location="args")
+list_parser.add_argument("page", type=int, default=1, location="args")
 list_parser.add_argument("page_size", type=int, default=10, location="args")
-list_parser.add_argument("type_id",   type=int, location="args")
+list_parser.add_argument("type_id", type=int, location="args")
 list_parser.add_argument("date_from", type=str, location="args")
-list_parser.add_argument("date_to",   type=str, location="args")
-
+list_parser.add_argument("date_to", type=str, location="args")
 
 
 def _get_or_404_owned(session_id: int, owner_id: int) -> WorkoutSession:

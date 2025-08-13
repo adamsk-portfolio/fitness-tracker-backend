@@ -5,8 +5,7 @@ def auth_headers(client):
     )
     print("REGISTER:", resp.status_code, resp.get_json())
     assert resp.status_code in (200, 201), (
-        f"REGISTER FAIL: {resp.status_code} "
-        f"{resp.get_data(as_text=True)}"
+        f"REGISTER FAIL: {resp.status_code} " f"{resp.get_data(as_text=True)}"
     )
 
     resp = client.post(
@@ -15,8 +14,7 @@ def auth_headers(client):
     )
     print("LOGIN:", resp.status_code, resp.get_json())
     assert resp.status_code == 200, (
-        f"LOGIN FAIL: {resp.status_code} "
-        f"{resp.get_data(as_text=True)}"
+        f"LOGIN FAIL: {resp.status_code} " f"{resp.get_data(as_text=True)}"
     )
 
     data = resp.get_json()
