@@ -188,12 +188,7 @@ class GoalList(Resource):
 
         total = q_obj.count()
 
-        rows = (
-            q_obj.order_by(Goal.id.desc())
-            .limit(page_size)
-            .offset((page - 1) * page_size)
-            .all()
-        )
+        rows = q_obj.order_by(Goal.id.desc()).limit(page_size).offset((page - 1) * page_size).all()
 
         items = [
             {
