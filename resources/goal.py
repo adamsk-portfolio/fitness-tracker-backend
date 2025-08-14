@@ -6,6 +6,7 @@ from sqlalchemy import or_
 
 from ..extensions import db
 from ..models import ExerciseType, Goal
+from ..utils.progress import compute_goal_progress
 
 
 def _positive_int(v):
@@ -84,6 +85,7 @@ list_parser.add_argument("period", type=str, location="args")
 list_parser.add_argument("exercise_type_id", type=int, location="args")
 list_parser.add_argument("from", type=str, dest="date_from", location="args")
 list_parser.add_argument("to", type=str, dest="date_to", location="args")
+list_parser.add_argument("with_progress", type=str, location="args")
 
 
 update_parser = reqparse.RequestParser()
@@ -146,6 +148,8 @@ class GoalList(Resource):
         page = max(1, args["page"] or 1)
         page_size = min(max(1, args["page_size"] or 10), 100)
 
+        want_progress = str(args.get("with_progress") or "").lower() in {"1", "true", "yes"}
+
         q_obj = (
             db.session.query(Goal, ExerciseType.name.label("etype_name"))
             .outerjoin(ExerciseType, Goal.exercise_type_id == ExerciseType.id)
@@ -190,8 +194,9 @@ class GoalList(Resource):
 
         rows = q_obj.order_by(Goal.id.desc()).limit(page_size).offset((page - 1) * page_size).all()
 
-        items = [
-            {
+        items = []
+        for g, etype_name in rows:
+            it = {
                 "id": g.id,
                 "description": g.description,
                 "target_value": g.target_value,
@@ -202,8 +207,10 @@ class GoalList(Resource):
                 "exercise_type_id": g.exercise_type_id,
                 "exercise_type": etype_name,
             }
-            for (g, etype_name) in rows
-        ]
+            if want_progress:
+                pr = compute_goal_progress(g).as_dict()
+                it["progress"] = pr
+            items.append(it)
 
         return {
             "items": items,
