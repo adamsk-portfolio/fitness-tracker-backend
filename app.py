@@ -40,6 +40,7 @@ def create_app() -> Flask:
     from .resources.exercise import ExerciseTypeDetail, ExerciseTypeList
     from .resources.goal import GoalDetail, GoalList
     from .resources.health import bp as health_bp
+    from .resources.report import SummaryReport
     from .resources.session import SessionDetail, SessionList
 
     api.add_resource(GoalList, "/goals")
@@ -53,6 +54,8 @@ def create_app() -> Flask:
 
     api.add_resource(ExerciseTypeList, "/exercise-types")
     api.add_resource(ExerciseTypeDetail, "/exercise-types/<int:type_id>")
+
+    api.add_resource(SummaryReport, "/reports/summary")
 
     app.register_blueprint(health_bp)
 
