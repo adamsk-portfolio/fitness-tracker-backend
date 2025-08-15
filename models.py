@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime
 
 from flask_jwt_extended import create_access_token
@@ -10,8 +11,14 @@ class User(db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
+
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+
+    provider = db.Column(db.String(20), nullable=True, index=True)
+    provider_sub = db.Column(db.String(255), unique=True, nullable=True)
+    name = db.Column(db.String(120), nullable=True)
+    avatar_url = db.Column(db.String(255), nullable=True)
 
     sessions = db.relationship("WorkoutSession", backref="user", lazy=True)
     goals = db.relationship("Goal", backref="user", lazy=True)
@@ -19,6 +26,10 @@ class User(db.Model):
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
+
+    def set_unusable_password(self) -> None:
+        random_pwd = "!" + secrets.token_urlsafe(32)
+        self.password_hash = generate_password_hash(random_pwd)
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import os
+
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from . import config
-from .extensions import db, jwt, migrate
+from .extensions import db, jwt, migrate, oauth
 
 
 def create_app() -> Flask:
@@ -16,11 +19,30 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(config)
 
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
+    app.config.setdefault("GOOGLE_CLIENT_ID", os.environ.get("GOOGLE_CLIENT_ID", ""))
+    app.config.setdefault("GOOGLE_CLIENT_SECRET", os.environ.get("GOOGLE_CLIENT_SECRET", ""))
+    app.config.setdefault(
+        "FRONTEND_OAUTH_REDIRECT",
+        os.environ.get("FRONTEND_OAUTH_REDIRECT", "http://localhost:8080/login/oauth"),
+    )
+
     app.json.ensure_ascii = False
 
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+
+    if oauth is not None:
+        oauth.init_app(app)
+        oauth.register(
+            name="google",
+            client_id=app.config["GOOGLE_CLIENT_ID"],
+            client_secret=app.config["GOOGLE_CLIENT_SECRET"],
+            server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+            client_kwargs={"scope": "openid email profile", "prompt": "consent"},
+        )
 
     CORS(
         app,
@@ -58,6 +80,13 @@ def create_app() -> Flask:
     api.add_resource(SummaryReport, "/reports/summary")
 
     app.register_blueprint(health_bp)
+
+    try:
+        from .resources.oauth_google import bp as oauth_google_bp  # type: ignore
+
+        app.register_blueprint(oauth_google_bp)
+    except Exception:
+        pass
 
     try:
         from .resources.stats import StatsOverview  # type: ignore
