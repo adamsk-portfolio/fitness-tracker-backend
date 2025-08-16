@@ -56,6 +56,11 @@ update_parser.add_argument(
     type=_positive_int,
     location=("json", "form"),
 )
+update_parser.add_argument(
+    "date",
+    type=str,
+    location=("json", "form"),
+)
 
 list_parser = reqparse.RequestParser()
 list_parser.add_argument("page", type=int, default=1, location="args")
@@ -84,7 +89,7 @@ def _parse_iso(d: str) -> datetime:
         if len(d) == 10:
             dt = datetime.fromisoformat(d + "T00:00:00")
         else:
-            dt = datetime.fromisoformat(d)
+            dt = datetime.fromisoformat(d.replace(" ", "T"))
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         else:
@@ -195,6 +200,8 @@ class SessionDetail(Resource):
             session.duration = args["duration"]
         if args["calories"] is not None:
             session.calories = args["calories"]
+        if args.get("date"):
+            session.date = _parse_iso(args["date"])
 
         db.session.commit()
         return {"message": "updated"}, 200
