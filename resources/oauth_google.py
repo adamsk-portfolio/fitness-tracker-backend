@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import Blueprint, current_app, jsonify, redirect, url_for
+from flask import Blueprint, current_app, jsonify, redirect
 
 from ..extensions import db, oauth
 from ..models import User
@@ -13,7 +13,9 @@ def google_login():
     if oauth is None or not hasattr(oauth, "google"):
         return jsonify({"message": "OAuth not configured"}), 501
 
-    redirect_uri = url_for("oauth_google.google_callback", _external=True)
+    redirect_uri = current_app.config.get(
+        "GOOGLE_REDIRECT_URI", "http://localhost:5000/api/auth/google/callback"
+    )
     return oauth.google.authorize_redirect(redirect_uri)
 
 

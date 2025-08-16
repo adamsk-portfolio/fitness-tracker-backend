@@ -24,6 +24,10 @@ def create_app() -> Flask:
     app.config.setdefault("GOOGLE_CLIENT_ID", os.environ.get("GOOGLE_CLIENT_ID", ""))
     app.config.setdefault("GOOGLE_CLIENT_SECRET", os.environ.get("GOOGLE_CLIENT_SECRET", ""))
     app.config.setdefault(
+        "GOOGLE_REDIRECT_URI",
+        os.environ.get("GOOGLE_REDIRECT_URI", "http://localhost:5000/api/auth/google/callback"),
+    )
+    app.config.setdefault(
         "FRONTEND_OAUTH_REDIRECT",
         os.environ.get("FRONTEND_OAUTH_REDIRECT", "http://localhost:8080/login/oauth"),
     )
