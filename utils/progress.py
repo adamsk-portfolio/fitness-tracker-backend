@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 
 from sqlalchemy import func
 
 from ..extensions import db
 from ..models import Goal, WorkoutSession
-from .dates import now_utc_naive, window_for_period
+from .dates import Window, end_of_day_exclusive, now_utc_naive, window_for_period
 
 
 def _session_datetime_col():
@@ -62,6 +63,19 @@ def _status_for_goal(goal: Goal, now) -> str:
     return "active"
 
 
+def _goal_window_or_period_window(goal: Goal, now: datetime) -> Window:
+    start = getattr(goal, "start_date", None)
+    end = getattr(goal, "end_date", None)
+
+    if start is not None or end is not None:
+        win_start = start or datetime.min.replace(microsecond=0)
+        win_end_raw = end or datetime.max.replace(microsecond=0)
+        win_end = end_of_day_exclusive(win_end_raw)
+        return Window(start=win_start, end=win_end)
+
+    return window_for_period(goal.period, now=now)
+
+
 def _aggregate_value(goal: Goal, win_start, win_end) -> int:
     dt_col = _session_datetime_col()
 
@@ -96,9 +110,11 @@ def _aggregate_value(goal: Goal, win_start, win_end) -> int:
 
 def compute_goal_progress(goal: Goal, *, now=None) -> Progress:
     now = now or now_utc_naive()
-    win = window_for_period(goal.period, now=now)
 
     status = _status_for_goal(goal, now)
+
+    win = _goal_window_or_period_window(goal, now)
+
     value = _aggregate_value(goal, win.start, win.end)
 
     target = int(getattr(goal, "target_value", 0) or 0)
