@@ -1,45 +1,51 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import sys
 import tempfile
+from pathlib import Path
 
 import pytest
 
-ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
+_here = Path(__file__).resolve()
+candidates = [_here.parents[2], _here.parents[1]]
+for c in candidates:
+    if c.exists() and str(c) not in sys.path:
+        sys.path.insert(0, str(c))
 
-from backend.app import create_app  # noqa: E402
-from backend.extensions import db as _db  # noqa: E402
+try:
+    from backend import models as _models
+    from backend.app import create_app
+    from backend.extensions import db as _db
+except Exception:
+    import models as _models
+    from app import create_app
+    from extensions import db as _db
 
 
 @pytest.fixture(scope="function")
 def app():
-    db_fd, db_path = tempfile.mkstemp()
-
+    fd, db_path = tempfile.mkstemp()
     app = create_app()
     app.config.update(
         TESTING=True,
         SQLALCHEMY_DATABASE_URI=f"sqlite:///{db_path}",
         JWT_SECRET_KEY="test-secret",
+        WTF_CSRF_ENABLED=False,
     )
-
     with app.app_context():
+        _ = _models
         _db.create_all()
-
-    yield app
-
-    with app.app_context():
-        _db.session.remove()
-        _db.drop_all()
-
-    os.close(db_fd)
-    os.unlink(db_path)
+    try:
+        yield app
+    finally:
+        with app.app_context():
+            _db.session.remove()
+            _db.drop_all()
+        os.close(fd)
+        os.unlink(db_path)
 
 
 @pytest.fixture(scope="function")
 def client(app):
-    """Flask test client."""
     return app.test_client()
